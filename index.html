@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Nex project description">
+	<title>touit.local</title>
+	<link rel="stylesheet" href="css/mobile.css" />
+</head>
+	<body>
+		<header>
+			<h1>
+				<span>Dark</span> Touitor
+			</h1>
+			<div id="error"></div>
+		</header>
+		<main>
+			<section class="main-first">
+				<form id="main-form" class="main-form" action='' method=''>
+					<label for="pseudo">
+						<input type="text" id="pseudo" maxlength='16' placeholder=" " />
+						<span>Pseudo</span>
+					</label>
+					
+					<label for="msg">
+						<input id="msg" maxlength='256' placeholder=" " />
+						<span>Touit</span>
+					</label>
+					
+					<input type="submit" id="sender" value="Poster" />
+				</form>
+			</section>
+			<section class="main-second">
+				<h2>
+					Touits <span id="touits-count"></span><br />Aller à la page : <span id="touits-pages"></span>
+				</h2>
+				<div id="list-touits">
+				
+				</div>
+			</section>
+		</main>
+		<aside class="other">
+			<section class="other-first">
+				<h3>
+					Mots les plus utilisés
+				</h3>
+				<div id="most-used">
+				
+				</div>
+			</section>
+			<section class="other-second">
+				<h3>
+					Touits les plus populaires
+				</h3>
+				<div id="most-pop">
+				
+				</div>
+			</section>
+			<section class="other-third">
+				<h3>
+					Touits à ne pas rater (auteurs les plus actifs)
+				</h3>
+				<div id="most-active">
+				
+				</div>
+			</section>
+			<section class="other-fourth">
+				<h3>
+					Touits avec le plus de commentaires
+				</h3>
+				<div id="most-commented">
+				
+				</div>
+			</section>
+		</aside>
+		<footer>
+			Made by NeoNagrarok
+		</footer>
+		<script src="js/test.js"></script>
+	</body>
+</html>

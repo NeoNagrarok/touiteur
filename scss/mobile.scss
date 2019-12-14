@@ -1,0 +1,384 @@
+@use 'partials/_base';
+
+$move: 1.2em;
+$darkColor: rgb(25, 25, 50);
+$lightColor: rgb(230, 230, 255);
+$red: rgba(255,25,25,.8);
+
+@mixin myButton
+{
+	border: none;
+	text-indent: 1em;
+	background: none;
+	background-size: 1.5em 1.5em;
+	background-repeat: no-repeat;
+}
+
+@mixin myLabel
+{
+	font-size: $move / 1.5;
+	margin-top: -1 * $move;
+	top: 0;
+	padding: 0.3em;
+	margin-left: 1em;
+	background-color: $lightColor;
+	color: $darkColor;
+	border-radius: 15px 15px 0 0;
+	border-top-style: solid;
+	border-top-color: black;
+	border-top-width: 1px;
+	border-left-style: solid;
+	border-left-color: black;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-right-color: black;
+	border-right-width: 1px;
+
+}
+
+body
+{
+	color: $lightColor;
+	background-color: $darkColor;
+}
+
+header
+{
+	text-align: center;
+}
+
+h1 span
+{
+	color: $red;
+}
+
+#error, #errorComment
+{
+	max-width: 60%;
+	margin: auto;
+	padding: 0.5em;
+
+	button
+	{
+		margin: 1em;
+		border-radius: 15px;
+	}
+}
+
+main
+{
+	display: grid;
+	grid-template-rows: 6em 1fr;
+	
+	section
+	{
+		padding: 1em;
+	}
+	
+	.main-first
+	{
+		grid-row: 1;
+		background-image: linear-gradient($darkColor, $red, $darkColor);
+	}
+	
+	.main-second
+	{
+		grid-row: 2;
+	}
+	
+	.pageButton
+	{
+		margin-left: 0.5em;
+		border-radius: 15px;
+	}
+	
+	.currentButton, .currentButton:hover, .currentButton:focus
+	{
+		box-shadow: 5px 0px 5px $red , -5px 0px 5px $red, 0px 5px 5px $red , 0px -5px 5px $red;
+		background-color: rgba(0,0,0,.2);
+		color: $lightColor;
+	}
+}
+
+input, button
+{
+	background-color: $lightColor;
+	margin-bottom: 0.5em;
+}
+
+button:hover, button:focus, input[type="submit"]:hover, input[type="submit"]:focus
+{
+	box-shadow: 5px 0px 5px $lightColor , -5px 0px 5px $lightColor, 0px 5px 5px $lightColor , 0px -5px 5px $lightColor;
+	border-radius: 15px;
+	cursor: pointer;
+}
+
+#list-touits
+{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.main-form
+{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	label
+	{
+		position: relative;
+		cursor: text;
+	}
+	
+	label>*, &>input
+	{
+		margin: 0.5em;
+		padding: 0.5em;
+		border-radius: 15px;
+	}
+	
+	label span
+	{
+		text-align: center;
+		font-weight: bold;
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		transition: all 0.5s;
+		text-indent: 0.5em;
+		background-color: $lightColor;
+		color: $darkColor;
+	}
+	
+	input
+	{
+		height: 3em;
+		box-shadow: 2px 2px 2px black;
+		border-style: solid;
+		border-color: black;
+		border-width: 1px;
+	}
+	
+	input:focus ~ span
+	{
+		@include myLabel;
+	}	
+	
+	input:not(:placeholder-shown) ~ span
+	{
+		@include myLabel;
+	}
+}
+
+.touit
+{
+	display: flex;
+	flex-direction: column;
+	box-shadow: 5px 0px 5px $red , -5px 0px 5px $red, 0px 5px 5px $red , 0px -5px 5px $red;
+	margin: 1em;
+	padding: 1em;
+	border-radius: 15px;
+	background-color: rgba(0,0,0,.3);
+
+	.pseudo
+	{
+		font-weight: bold;
+	}
+	
+	.msg
+	{
+		border-style: dotted;
+		border-color: $lightColor;
+		border-width: 1px;
+		word-wrap: break-word;
+		hyphens: auto;
+		padding: 1em;
+		margin-bottom: 1em;
+		border-radius: 15px;
+		overflow: auto;
+		word-wrap: break-word;
+		hyphens: auto;
+		max-width: 70vw;
+	}
+	
+	button
+	{
+		color: $lightColor;
+	}
+	
+	.comment
+	{
+		@include myButton;
+		background-image: url(../img/bulle.png);
+	
+	}
+	
+	.liker
+	{
+		@include myButton;
+		background-image: url(../img/coeur.png);
+	}
+	
+	.disliker
+	{
+		@include myButton;
+		background-image: url(../img/coeurNoir.png);
+	}
+}
+
+.other
+{
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	
+	&>section
+	{
+		padding: 0.5em;
+	}
+	
+	.other-first
+	{
+		grid-column: 1;
+		text-align: center;
+	}
+	
+	.other-second
+	{
+		grid-column: 2;
+		text-align: center;
+	}
+	
+	.other-third
+	{
+		grid-column: 3;
+		text-align: center;
+	}
+	
+	.other-fourth
+	{
+		grid-column: 4;
+		text-align: center;
+	}
+}
+
+#most-active div
+{
+	display: flex;
+	flex-direction: column;
+	
+	.author
+	{
+		margin: 1em;
+		border-radius: 15px;
+	}
+}
+
+.popin
+{
+	position: fixed;
+	margin-left: auto;
+	margin-right: auto;
+	top: 5em;
+	left: 0;
+	right: 0;
+	width: 30%;
+/*	min-height: 30%;*/
+	/*max-height: 60%;*/
+/*	background: yellow;*/
+
+	height: 80%;
+	overflow: hidden;
+
+	z-index: 999;
+	padding: 1em;
+	padding-top: 3em;
+	border-radius: 25px;
+	background-color: white;
+	box-shadow: 2px 2px 2px $lightColor;
+	border-color: lightColor;
+	border-width: 1px;
+	border-style: solid;
+	
+	background-color: $darkColor;
+	
+	.wrapper
+	{
+		max-height: 60vh;
+		overflow: auto;
+	}
+}
+
+#popin-back
+{
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 500;
+	background-color: rgba(0,0,0,0.5);
+}
+
+.exit
+{
+	position: absolute;
+	right: 1em;
+	top: 1em;
+}
+
+#commentForm
+{
+	display: flex;
+	flex-direction: column;
+}
+
+#commentBlock
+{
+	.wrapper
+	{
+		max-height: 30vh;
+	}
+	
+	input
+	{
+		border-radius: 15px;
+		padding: 0.5em;
+	}
+}
+
+.commentBlock
+{
+	display: flex;
+	flex-direction: column;
+	padding: 0.5em;
+	
+	.pseudo
+	{
+		font-weight: bold;
+	}
+	
+	.date
+	{
+		font-style: italic;
+	}
+	
+	.comment
+	{
+		padding: 0.5em;
+		border-style: dotted;
+		border-color: $lightColor;
+		border-width: 1px;
+		border-radius: 15px;
+		overflow: auto;
+		word-wrap: break-word;
+		hyphens: auto;
+		max-width: 70vw;
+	}
+}
+
+.stop-scrolling
+{
+	overflow: hidden;
+}
