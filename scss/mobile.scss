@@ -40,6 +40,59 @@ body
 {
 	color: $lightColor;
 	background-color: $darkColor;
+	
+	.zoneNotif
+	{
+		position: fixed;
+		right: 1em;
+		top: 1em;
+		height: 10em;
+		width: 20%;
+		box-shadow: 5px 0px 5px $red , -5px 0px 5px $red, 0px 5px 5px $red , 0px -5px 5px $red;
+		background-color: $darkColor;
+		border-radius: 15px;
+		padding: 0.5em;
+		transition: all 1s;
+		display: none;
+		flex-direction: column;
+		
+		button
+		{
+			position: absolute;
+			right: 0.5em;
+		}
+		
+		.wrapper
+		{
+			display: flex;
+			flex-direction: column;
+			overflow: auto;
+		}
+	}
+}
+
+.notif
+{
+	padding: 0.5em;
+	position: relative;
+	word-wrap: break-word;
+	hyphens: auto;
+	
+	.goNotif
+	{
+		position: relative;
+		right: auto;
+	}
+	
+	&.highlight
+	{
+		background-color: rgba(255,255,255,0.1);
+	}
+	
+	&.lowlight
+	{
+		background-color: rgba(0,0,0,0.2);
+	}
 }
 
 header
@@ -104,6 +157,7 @@ input, button
 {
 	background-color: $lightColor;
 	margin-bottom: 0.5em;
+	border-radius: 15px;
 }
 
 button:hover, button:focus, input[type="submit"]:hover, input[type="submit"]:focus

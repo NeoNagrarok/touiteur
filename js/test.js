@@ -34,6 +34,15 @@ let lastElement = null;
 let countElements = 1;
 let nbrPages = 1;
 let currentPage = 1;
+const tabId = [];
+const tabNotifs = [];
+
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 class Bot
 {
@@ -45,11 +54,16 @@ class Bot
 		this.pseudo = null;
 		this.msg = null;
 		this.tabMatchesResponse =	[
-										['/help', 'Command list : /test /chat //猫'],
-										['/test', 'You did a test'],
-										['/chat', 'ฅ^•ﻌ•^ฅ'],
-										['//猫', 'ฅ^•ﻌ•^ฅ']
+										['/help', this.help],
+										['/test', this.test],
+										['/chat', this.neko],
+										['//猫', this.neko],
+										['/like', this.like],
+										['/dislike', this.dislike],
+										['/comment', this.comment],
+										['/spam', this.spam]
 									];
+		this.thisLength = this.tabMatchesResponse.length;
 		this.response = null;
 //		document.getElementById('list-touits').addEventListener('DOMNodeInserted', this.userReader);
 		console.log('I\'m a ready bot');
@@ -78,25 +92,20 @@ class Bot
 	
 	userReader()
 	{
-//		console.log(document.getElementById('list-touits').firstChild.querySelector('.pseudo').textContent.split('-')[0].slice(0, -1) + ' - ' + document.getElementById('list-touits').firstChild.querySelector('.msg').textContent);
 		this.pseudo = document.getElementById('list-touits').firstChild.querySelector('.pseudo').textContent.split('-')[0].slice(0, -1);
-		this.msg = document.getElementById('list-touits').firstChild.querySelector('.msg').textContent;
-//		console.log(this.pseudo + ' - ' + this.msg);
+		this.msg = document.getElementById('list-touits').firstChild.querySelector('.msg').textContent.split(' ');
+		const [,,...comment] = this.msg;
+		this.comment = comment.join(' ');
+		this.msgLength = this.msg.length - 1;
 	}
 	
 	getResponse()
 	{
 //		console.log(this.pseudo + ' - ' + this.msg);
 		if (this.pseudo && this.msg && this.pseudo != this.botPseudo)
-		{
-			const length = this.tabMatchesResponse.length;
-			for (let i = 0; i < length; i++)
-			{
-				const regex = new RegExp('^' + this.tabMatchesResponse[i][0] + '$', 'i');
-				if (regex.test(this.msg))
-					this.response = this.tabMatchesResponse[i][1];
-			}
-		}
+			for (let i = 0; i < this.thisLength; i++)
+				if (this.msg[0].toLowerCase() === this.tabMatchesResponse[i][0])
+					this.response = this.tabMatchesResponse[i][1](this);
 	}
 	
 	postResponse()
@@ -117,9 +126,107 @@ class Bot
 			this.response = null;
 		}
 	}
+	
+	help(obj)
+	{
+		return '‏‏‎ ‎/test /chat //猫 /like /dislike /comment /spam';
+	}
+	
+	test(obj)
+	{
+		if (!obj.msgLength)
+			return 'You did a test without parameters';
+		return 'You did a test with ' + obj.msgLength + ' parameters';
+	}
+	
+	neko(obj)
+	{
+		return 'ฅ^•ﻌ•^ฅ';
+	}
+	
+	like(obj)
+	{
+		if (!obj.msgLength)
+			return 'Usage : /like message_id';
+		const req = new XMLHttpRequest();
+		const params = 'message_id=' + encodeURIComponent(obj.msg[1]);
+		req.open('PUT', 'http://touiteur.cefim-formation.org/likes/send', true);
+		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+			if(req.readyState === 4)
+				if (req.status === 200)
+				{
+					obj.response = 'Touit ' + obj.msg[1] + ' doesn\'t exist before this message !';
+					if (JSON.parse(req.responseText).error === undefined)
+						obj.response = 'Touit ' + obj.msg[1] + ' liked';
+					obj.postResponse();
+				}
+		}
+		req.send(params);
+		return null;
+	}
+	
+	dislike(obj)
+	{
+		if (!obj.msgLength)
+			return 'Usage : /dislike message_id';
+		const req = new XMLHttpRequest();
+		const params = 'message_id=' + encodeURIComponent(obj.msg[1]);
+		req.open('DELETE', 'http://touiteur.cefim-formation.org/likes/remove', true);
+		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+			if(req.readyState === 4)
+				if (req.status === 200)
+				{
+					obj.response = 'Touit ' + obj.msg[1] + ' doesn\'t exist before this message !';
+					if (JSON.pa474rse(req.responseText).error === undefined)
+						obj.response = 'Touit ' + obj.msg[1] + ' disliked';
+					obj.postResponse();
+				}
+		}
+		req.send(params);
+		return null;
+	}
+	
+	comment(obj)
+	{
+		console.log(obj.botTag + obj.user);
+		if (obj.msgLength < 2)
+			return 'Usage : /comment message_id message';
+		const req = new XMLHttpRequest();
+		const params = 'name=' + obj.botTag + obj.user + '&comment=' + encodeURIComponent(obj.comment) + '&message_id=' + encodeURIComponent(obj.msg[1]);
+		req.open('POST', 'http://touiteur.cefim-formation.org/comments/send', true);
+		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		req.onreadystatechange = function () {
+			if(req.readyState === 4)
+				if (req.status === 200)
+				{
+					console.log(req.responseText);
+					obj.response = 'Touit ' + obj.msg[1] + ' doesn\'t exist before this message !';
+					if (JSON.parse(req.responseText).error === undefined)
+						obj.response = 'Touit ' + obj.msg[1] + ' commented with ' + obj.comment;
+					obj.postResponse();
+				}
+		}
+		req.send(params);
+	}
+	
+	spam(obj)
+	{
+		if (!obj.msgLength)
+			return 'Usage : /spam command args';
+		return 'Coming soon';
+	}
 }
 
 const bot = new Bot();
+
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 function myCreateElement(element, text)
 {
@@ -178,6 +285,79 @@ const setPage = () => {
 	}
 }
 
+const pushNotif = () => { // TODO Notifications
+	
+	const zoneNotif = document.querySelector('.zoneNotif');
+	zoneNotif.style.display = 'flex';
+	zoneNotif.querySelector('button').addEventListener('click', e => zoneNotif.style.display = 'none');
+	const wrapper = document.querySelector('.wrapper');
+	wrapper.innerHTML = '';
+	tabNotifs.forEach(x => wrapper.appendChild(Object.values(x)[0]));
+	zoneNotif.appendChild(wrapper);
+	document.body.appendChild(zoneNotif);
+}
+
+const generateNotif = (obj) => {
+//	const notifHTML = myCreateElement('span', obj.message);
+	
+	const notifHTML = document.createElement('span');
+	const buttonModal = document.createElement('button');
+	buttonModal.className = 'goNotif';
+	buttonModal.id = 'notif' + obj.id;
+	// TODO addEventListener here
+	buttonModal.addEventListener('click', e => {
+		console.log(e.target.id.replace('notif', ''));
+		const popin = myCreateElement('div', obj.id);
+		popin.className = 'popin';
+		document.body.popin;
+		
+	});
+	buttonModal.appendChild(document.createTextNode('Voir'));
+	notifHTML.appendChild(buttonModal);
+	notifHTML.appendChild(document.createElement('br'));
+	notifHTML.appendChild(document.createTextNode(obj.message));
+	notifHTML.className = 'notif';
+	
+	if (tabNotifs.length % 2)
+		notifHTML.classList.add('highlight');
+	else
+		notifHTML.classList.add('lowlight');
+	
+	const notif = {[obj.id]: notifHTML};
+	if (tabNotifs.indexOf(notif) == -1)
+		tabNotifs.push(notif);
+		
+	const buttonRemoveNotif = myCreateElement('button', 'X');
+	buttonRemoveNotif.addEventListener('click', e => {
+		const parent = e.target.parentNode;
+		tabNotifs.splice(tabNotifs.indexOf(notif), 1);
+		const wrapper = parent.parentNode;
+		parent.remove();
+		console.log(wrapper.textContent.length);
+		if (wrapper.textContent.length === 0)
+			wrapper.parentNode.style.display = 'none';
+	});
+	
+	notifHTML.appendChild(buttonRemoveNotif);
+}
+
+const surveilNotif = () => {
+//	console.log(tabId);/* TODO Make a function to push notification */
+	tabId.forEach(x => {
+		x[1] = !x[1] ? listTouits['messages'][listTouits['messages'].findIndex(y => y.id == x[0])] : JSON.stringify(x[1]) !== JSON.stringify(listTouits['messages'][listTouits['messages'].findIndex(y => y.id == x[0])]) ? ((before, after) => {
+		
+//			console.log(before + ' ' + after);
+			
+			// TODO generate notifications here ? With a global tab ?
+			generateNotif(after);
+			
+			pushNotif();
+			
+			return after;
+		})(x[1], listTouits['messages'][listTouits['messages'].findIndex(y => y.id == x[0])]) : x[1]; // TOTO
+	});
+}
+
 const getList = () => {
 	const req = new XMLHttpRequest();
 	req.open('GET', getRequest, true);
@@ -191,21 +371,24 @@ const getList = () => {
 			setPage();
 			touitsGetter();
 			bot.run();
+			surveilNotif();
 		}
 	};
 	req.send();
 }
 
 const getTouit = (tab, i, bool) => {
-	if (tab[i + 1] && tab[i + 1]['name'] == tab[i]['name'] && tab[i + 1]['message'] == tab[i]['message'])
+	if (bool && tab[i + 1] && tab[i + 1]['name'] == tab[i]['name'] && tab[i + 1]['message'] == tab[i]['message'])
 	{
 		return '';
 	}
 	const date = new Date(tab[i]['ts'] * 1000);
 	const touit = document.createElement('div');
 	touit.className = 'touit';
+	if (bool)
+		touit.id = tab[i]['id'];
 	const tabTouitElements = [];
-	const pseudo = myCreateElement('span', tab[i]['name'] + ' - ' + tab[i]['ip']);
+	const pseudo = myCreateElement('span', tab[i]['name'] + ' - ' + tab[i]['ip'] + ' - ' + tab[i]['id']);
 	pseudo.className = 'pseudo';
 	tabTouitElements.push(pseudo);
 	const hour = date.getHours();
@@ -338,7 +521,7 @@ const makeAuthorTab = () =>
 	mostActive.innerHTML = '';
 	for (let i = 0; listAuthor[i] && i < MAX_AUTH; i++)
 	{
-		const button = myCreateElement('button', Object.keys(listAuthor[i])[0]);
+		const button = myCreateElement('button', Object.keys(listAuthor[i])[0] + ' (' + Object.values(listAuthor[i])[0] + ')');
 		button.className = 'author';
 		button.type = 'button';
 		button.addEventListener('click', displayAuthorTouit);
@@ -352,8 +535,9 @@ const getAuthorTouits = author => {
 	wrapper.className = 'wrapper';
 	const authorTouits = [];
 	let j = 0;
+//	console.log(author.split('(')[0].slice(0, -1));
 	for (let i = 0; i < length; i++)
-		if (listTouits['messages'][i]['name'] == author)
+		if (listTouits['messages'][i]['name'] == author.split('(')[0].slice(0, -1))
 			authorTouits.push(listTouits['messages'][i]) && j++;
 	for (let i = 0; i < MAX_AUTH_TOUITS && i < j; i++)
 		wrapper.append(getTouit(authorTouits, i, false));
@@ -571,12 +755,15 @@ const sendTouit = (e) => {
 	req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	req.onreadystatechange = function () {
 		if(req.readyState === 4 && req.status === 200) {
-			//console.log(req.responseText);
-			const error = JSON.parse(req.responseText)['error'];
+			console.log(req.responseText);
+			const response = JSON.parse(req.responseText);
+			const error = response['error'];
 			if (error && error.split(' ')[0] == 'Name')
 				setError('error', 'Votre pseudo doit compter entre 3 et 256 caractères inclus !');
 			else if (error && error.split(' ')[0] == 'Message')
 				setError('error', 'Votre message doit compter entre 3 et 256 caractères inclus !');
+			else
+				tabId.push([response.id, null]);
 		}
 	}
 	req.send(params);
